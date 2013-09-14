@@ -211,7 +211,7 @@
 			path = util;
 			sourceTree = "<group>";
 		};
-		E7B69C11176C0A0800B78DA1 /* Resources */ = {
+		E7B69C11176C0A0800B78DA1 /* resources */ = {
 			isa = PBXGroup;
 			children = (
 				E7B69C0F176C09F700B78DA1 /* beam.png */,
@@ -221,8 +221,8 @@
 				E7E1EBEA163ED39D00BC35B3 /* Default-568h@2x.png */,
 				E79BAEA416E7329D004B7A3F /* ball2.png */,
 			);
-			name = Resources;
-			path = Jasmine/Resources;
+			name = resources;
+			path = Jasmine/resources;
 			sourceTree = "<group>";
 		};
 		E7E23D1F163694780053EFF8 /* text */ = {
@@ -242,7 +242,7 @@
 		E7ED4C4C1600C88300B42EFB = {
 			isa = PBXGroup;
 			children = (
-				E7B69C11176C0A0800B78DA1 /* Resources */,
+				E7B69C11176C0A0800B78DA1 /* resources */,
 				E7ED4C611600C88300B42EFB /* Jasmine */,
 				F0B5DD6116169E3300CD4072 /* Resources */,
 				E7ED4C5A1600C88300B42EFB /* Frameworks */,
