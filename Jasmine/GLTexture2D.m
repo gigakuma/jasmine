@@ -114,6 +114,52 @@ static __inline__ unsigned long nextPowerOfTow(unsigned long x)
     return self;
 }
 
+- (void)refreshWithData:(const void *)data pixelFormat:(Texture2DPixelFormat)format contentWidth:(NSUInteger)width contentHeight:(NSUInteger)height offsetX:(NSInteger)x offsetY:(NSInteger)y
+{
+    glBindTexture(GL_TEXTURE_2D, _glID);
+    switch (format) {
+        case kTexture2DPixelFormat_RGBA8888:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            break;
+        case kTexture2DPixelFormat_RGB888:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_RGB, GL_UNSIGNED_BYTE, data);
+            break;
+        case kTexture2DPixelFormat_RGBA4444:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, data);
+            break;
+        case kTexture2DPixelFormat_RGBA5551:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, data);
+            break;
+        case kTexture2DPixelFormat_RGB565:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
+            break;
+        case kTexture2DPixelFormat_L8:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+            break;
+        case kTexture2DPixelFormat_LA88:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, data);
+            break;
+        case kTexture2DPixelFormat_A8:
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+            break;
+        case kTexture2DPixelFormat_RGB_PVRTC2:
+            glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG, (GLsizei)(width * height) / 4, data);
+            break;
+        case kTexture2DPixelFormat_RGB_PVRTC4:
+            glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG, (GLsizei)(width * height) / 2, data);
+            break;
+        case kTexture2DPixelFormat_RGBA_PVRTC2:
+            glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG, (GLsizei)(width * height) / 4, data);
+            break;
+        case kTexture2DPixelFormat_RGBA_PVRTC4:
+            glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (GLsizei)width, (GLsizei)height, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG, (GLsizei)(width * height) / 2, data);
+            break;
+        default:
+            break;
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 - (void)setAntiAlias:(BOOL)antiAlias
 {
     if (antiAlias == _antiAlias)

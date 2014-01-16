@@ -48,6 +48,13 @@ typedef enum
         pixelsHigh:(NSUInteger)height
        contentSize:(CGSize)size;
 
+- (void)refreshWithData:(const void *)data
+            pixelFormat:(Texture2DPixelFormat)format
+           contentWidth:(NSUInteger)width
+          contentHeight:(NSUInteger)height
+                offsetX:(NSInteger)x
+                offsetY:(NSInteger)y;
+
 - (void)destory;
 
 - (void)generateMipmap;
