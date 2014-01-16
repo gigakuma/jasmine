@@ -159,11 +159,12 @@
 
 - (GLKVector3)emitPosition
 {
-    float theta = RANDOM_0_1 * (float)M_PI;
+    float theta = acosf(2 * RANDOM_0_1 - 1);
     float phi = RANDOM_0_1 * (float)M_PI * 2;
-    float a = RANDOM_MINUS1_1 * _size.x / 2;
-    float b = RANDOM_MINUS1_1 * _size.y / 2;
-    float c = RANDOM_MINUS1_1 * _size.z / 2;
+    float r = RANDOM_0_1;
+    float a = r * _size.x / 2;
+    float b = r * _size.y / 2;
+    float c = r * _size.z / 2;
     float sin_theta = sinf(theta);
     float cos_theta = cosf(theta);
     float sin_phi = sinf(phi);
