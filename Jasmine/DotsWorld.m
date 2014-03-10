@@ -40,19 +40,19 @@
         self.camera.up = GLKVector3Make(0.f, 1.f, -1.f);
         
         _volume = [[VolumeTest alloc] init];
-        [self addChild:_volume];
+        [self addObject:_volume];
         _volume.visible = NO;
         _rect = [[TestRect alloc] init];
         _rect.color1 = _rect.color2 = GLKVector4Make(0.3f, 0.f, 0.f, 0.3f);
         _rect.color3 = _rect.color4 = GLKVector4Make(0.4f, 0.f, 0.f, 0.4f);
-        [self addChild:_rect];
+        [self addObject:_rect];
         _beam = [[TestBeam alloc] init];
-        [self addChild:_beam];
+        [self addObject:_beam];
 
         SphereEmitter *emitter = [SphereEmitter new];
         emitter.size = GLKVector3Make(150.f, 150.f, 150.f);
         _particleSystem = [[PointParticleSystem alloc] initWithMaxCount:10000 withEmitter:emitter];
-        _particleSystem.speed = 0;
+        _particleSystem.speed = 30;
         _particleSystem.speedVariety = 1;
         _particleSystem.color = GLKVector4Make(0.9f, 0.7f, 0.2f, 1);
         _particleSystem.autoEmit = YES;
@@ -60,7 +60,7 @@
         _particleSystem.maxLife = 1.5f;
         _particleSystem.maxLifeVariety = 0;
         _particleSystem.forceEmitWhenFull = YES;
-        [self addChild:_particleSystem];
+        [self addObject:_particleSystem];
         
         _dots = [NSMutableArray new];
         _dotsCache = [NSMutableArray new];
@@ -82,7 +82,7 @@
                 Dot *dot = [_dots objectAtIndex:i];
                 if (dot.translateY < -500.f) {
                     [_dots removeObjectAtIndex:i];
-                    [self removeChild:dot];
+                    [self removeObject:dot];
                     i--;
                     [_dotsCache addObject:dot];
                 }
@@ -94,7 +94,7 @@
             
         }] play];
         
-        [[Action timerWithInterval:0.02 repeat:-1 delegate:^(int n) {
+        [[Action timerWithInterval:0.04 repeat:-1 delegate:^(int n) {
             [self generateRandomDots:1];
         }] play];
         
@@ -124,7 +124,7 @@
         dot.translateZ = RANDOM_MINUS1_1 * 600.f;
         dot.velocity = GLKVector3Make(RANDOM_MINUS1_1 * 5, -100 + (RANDOM_MINUS1_1 + 1.0f) * 10, 0);
         [_dots addObject:dot];
-        [self addChild:dot];
+        [self addObject:dot];
     }
 }
 float temptest = 0;

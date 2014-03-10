@@ -41,6 +41,7 @@ static Director *singleton = nil;
 @synthesize timeInterval = _timeInterval;
 @synthesize view = _view;
 @synthesize framesDisplayed = _framesDisplayed;
+@synthesize screen = _screen;
 
 + (Director*)sharedDirector
 {
@@ -155,10 +156,10 @@ static Director *singleton = nil;
     ++_framesDisplayed;
     [self timeCalculate];
     [[Timeline sharedTimeline] updateWithInterval:_timeInterval];
-    [_scene visit];
+//    [_scene visit];
     
     [_view renderBegin];
-    [_scene draw];
+    [_screen render];
     [_view renderEnd];
 }
 

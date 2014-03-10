@@ -1,20 +1,24 @@
 //
-//  ModelUnit.m
+//  GElement.m
 //  Jasmine
 //
-//  Created by Qiang Li on 12-9-18.
-//  Copyright (c) 2012 Qiang Li. All rights reserved.
+//  Created by Qiang on 3/9/14.
+//  Copyright (c) 2014 Alven.Li. All rights reserved.
 //
 
-#import "DrawModel.h"
+#import "GObject.h"
 
-@implementation DrawModel
+@implementation GObject
 {
     @private
     BOOL _modelViewDirty;
 }
-@synthesize world = _world;
+
 @synthesize parent = _parent;
+
+@synthesize visible = _visible;
+
+@synthesize modelView = _modelView;
 @synthesize translate = _translate;
 @synthesize center = _center;
 @synthesize rotate = _rotate;
@@ -31,24 +35,20 @@
         _center = GLKVector3Make(0, 0, 0);
         _rotate = GLKVector3Make(0, 0, 0);
         _scale = GLKVector3Make(1, 1, 1);
+        _parent = nil;
     }
     return self;
 }
 
-// override
-- (void)draw
-{
-}
+- (void)renderWithModelView:(GLKMatrix4)modelView inWorld:(GWorld *)world { }
 
-- (void)visit
+- (void)visitInWorld:(GWorld *)world
 {
-    if (!_visible)
+    if (!self.visible)
 		return;
-    
     GLMatrixStackPush();
     GLMatrixStackMultiple(self.modelView);
-    _modelToWorldTransformCache = GLMatrixStackGetTop();
-
+    [self renderWithModelView:GLMatrixStackGetTop() inWorld:world];
     GLMatrixStackPop();
 }
 
@@ -85,10 +85,8 @@
 
 - (void)setTranslate:(GLKVector3)translate
 {
-    if (!GLKVector3AllEqualToVector3(_translate, translate)) {
-        _translate = translate;
-        _modelViewDirty = YES;
-    }
+    _translate = translate;
+    _modelViewDirty = YES;
 }
 
 - (GLKVector3)center
@@ -98,10 +96,8 @@
 
 - (void)setCenter:(GLKVector3)center
 {
-    if (!GLKVector3AllEqualToVector3(_center, center)) {
-        _center = center;
-        _modelViewDirty = YES;
-    }
+    _center = center;
+    _modelViewDirty = YES;
 }
 
 - (GLKVector3)rotate
@@ -111,10 +107,8 @@
 
 - (void)setRotate:(GLKVector3)rotate
 {
-    if (!GLKVector3AllEqualToVector3(_rotate, rotate)) {
-        _rotate = rotate;
-        _modelViewDirty = YES;
-    }
+    _rotate = rotate;
+    _modelViewDirty = YES;
 }
 
 - (GLKVector3)scale
@@ -124,15 +118,13 @@
 
 - (void)setScale:(GLKVector3)scale
 {
-    if (!GLKVector3AllEqualToVector3(_scale, scale)) {
-        _scale = scale;
-        _modelViewDirty = YES;
-    }
+    _scale = scale;
+    _modelViewDirty = YES;
 }
 
 @end
 
-@implementation DrawModel (TransformHelperProperties)
+@implementation GObject (TransformHelperProperties)
 
 - (float)translateX
 {
@@ -280,50 +272,20 @@
 
 @end
 
-@implementation DrawModel (TransformAnimationMethods)
-
-- (Action*)animationWithKeyAndFloatValues:(NSDictionary*)dict duration:(NSTimeInterval)duration
-{
-    __weak DrawModel *model = self;
-    
-    // capture start values
-    NSMutableDictionary *startValues = [NSMutableDictionary new];
-    [dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [startValues setObject:[model valueForKey:key] forKey:key];
-    }];
-    
-    Action *action = [[Action alloc] initWithDuration:duration];
-    action.update = ^(double p) {
-        [startValues enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            float startValue = [obj floatValue];
-            float endValue = [[dict objectForKey:key] floatValue];
-            [model setValue:@(startValue + ((float) p) * (endValue - startValue)) forKey:key];
-        }];
-    };
-    return action;
-}
-
-@end
-
-@implementation DrawModel (WorldSpace)
+@implementation GObject (WorldSpace)
 
 - (GLKVector3)worldSpacePosition
 {
-    return [self modelPointToWorld:_center];
+    return [self pointInModelToWorld:_center];
 }
 
 - (GLKMatrix4)modelToWorldTransform
 {
     GLKMatrix4 matrix = self.modelView;
-    for (DrawModel *p = (DrawModel*)self.parent; p != nil; p = (DrawModel*)p.parent) {
+    for (GObject *p = (GObject*)self.parent; p != nil; p = (GObject*)p.parent) {
         matrix = GLKMatrix4Multiply(p.modelView, matrix);
     }
     return matrix;
-}
-
-- (GLKMatrix4)modelToWorldTransformCache
-{
-    return _modelToWorldTransformCache;
 }
 
 - (GLKMatrix4)worldToModelTransform
@@ -331,14 +293,39 @@
     return GLKMatrix4Invert(self.modelToWorldTransform, NULL);
 }
 
-- (GLKVector3)modelPointToWorld:(GLKVector3)point
+- (GLKVector3)pointInModelToWorld:(GLKVector3)point
 {
     return GLKMatrix4MultiplyAndProjectVector3(self.modelToWorldTransform, point);
 }
 
-- (GLKVector3)worldPointToModel:(GLKVector3)point
+- (GLKVector3)pointInWorldToModel:(GLKVector3)point
 {
     return GLKMatrix4MultiplyAndProjectVector3(self.worldToModelTransform, point);
+}
+
+@end
+
+@implementation GObject (TransformAnimationMethods)
+
+- (Action*)animationWithKeyAndFloatValues:(NSDictionary*)dict duration:(NSTimeInterval)duration
+{
+    __weak GObject *go = self;
+    
+    // capture start values
+    NSMutableDictionary *startValues = [NSMutableDictionary new];
+    [dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [startValues setObject:[go valueForKey:key] forKey:key];
+    }];
+    
+    Action *action = [[Action alloc] initWithDuration:duration];
+    action.update = ^(double p) {
+        [startValues enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            float startValue = [obj floatValue];
+            float endValue = [[dict objectForKey:key] floatValue];
+            [go setValue:@(startValue + ((float) p) * (endValue - startValue)) forKey:key];
+        }];
+    };
+    return action;
 }
 
 @end

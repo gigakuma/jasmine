@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DrawModel.h"
+#import "GObject.h"
 
-@interface TestRect : DrawModel
+@interface TestRect : GObject
 
 @property (nonatomic) GLKVector4 color1, color2, color3, color4;
 

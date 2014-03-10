@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
 #import "GLView.h"
-#import "DrawScene.h"
+#import "GScreen.h"
 
 @interface Director : NSObject
 
@@ -21,7 +21,7 @@
 @property (nonatomic, readonly) NSUInteger framesDisplayed;
 @property (nonatomic, readonly) float framePerSecond;
 
-@property (nonatomic) DrawScene *scene;
+@property (nonatomic) GScreen *screen;
 
 @property (nonatomic) GLView *view;
 

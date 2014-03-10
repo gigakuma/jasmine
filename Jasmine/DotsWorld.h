@@ -6,12 +6,12 @@
 //  Copyright (c) 2012 Qiang Li. All rights reserved.
 //
 
-#import "DrawWorld.h"
+#import "GWorld.h"
 #import "TestRect.h"
 
 @class Dot;
 
-@interface DotsWorld : DrawWorld
+@interface DotsWorld : GWorld
 
 @property (assign, nonatomic, readonly) float width, height;
 @property (strong, nonatomic, readonly) NSArray *dots;

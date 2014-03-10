@@ -8,7 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "ParticleSystem.h"
+#import "GLTexture2D.h"
 
 @interface QuadParticleSystem : ParticleSystem
+
+@property (nonatomic) float speed;
+@property (nonatomic) float speedVariety;
+
+@property (nonatomic) GLTexture2D *spirit;
 
 @end

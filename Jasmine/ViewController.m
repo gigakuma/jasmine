@@ -10,7 +10,7 @@
 #import "Director.h"
 #import "GLProgram.h"
 #import "GLStateCache.h"
-#import "DrawWorld.h"
+#import "GWorld.h"
 #import "TestRect.h"
 #import "Timeline.h"
 #import "DotsWorld.h"
@@ -158,9 +158,9 @@
 - (void)startPlay
 {
     GLView *view = (GLView *)self.view;
-    DrawScene *scene = [[DrawScene alloc] init];
+    GScreen *screen = [GScreen new];
     DotsWorld *dotsWorld = [[DotsWorld alloc] initWithWidth:view.width / [[UIScreen mainScreen] scale] height:view.height / [[UIScreen mainScreen] scale]];
-    [scene addWorld:dotsWorld];
+    [screen addWorld:dotsWorld];
     // opengl screen coordinate:
     // (-1,  1)  ^  ( 1,  1)
     //         --+->
@@ -194,7 +194,7 @@
     NSLog(@"far :%.2f, %.2f, %.2f", farPoint.x, farPoint.y, farPoint.z);
     //SCREEN TO WORLD
     
-    _director.scene = scene;
+    _director.screen = screen;
 //    GLKVector3 unit = GLKVector3Make(1, 0, 0);
 //    
 //    unit = GLKMatrix4MultiplyAndProjectVector3(GLKMatrix4Invert(dotsWorld.camera.matrix, NULL), unit);
@@ -302,12 +302,17 @@
 CGPoint lastPos = CGPointMake(0, 0);
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    DotsWorld *dotWorld = (DotsWorld*) _director.scene.worlds[0];
+    DotsWorld *dotWorld = (DotsWorld*) _director.screen.worlds[0];
     UITouch *touch = [touches anyObject];
     CGPoint loc = [touch locationInView:self.view];
     
-    dotWorld.rotateZ += 0.01f * (loc.x - lastPos.x);
-    dotWorld.rotateX += 0.01f * (-loc.y + lastPos.y);
+//    dotWorld.camera
+//    [dotWorld.camera rotateXAroundCenterWithRadians:0.01f * (loc.x - lastPos.x)];
+//    [dotWorld.camera rotateYAroundCenterWithRadians:0.01f * (-loc.y + lastPos.y)];
+    [dotWorld.camera rotateWithVector:GLKVector3Make(0.01f * (-loc.y + lastPos.y), 0, 0.01f * (loc.x - lastPos.x))];
+//    NSLog(@"%f", 0.01f * (loc.x - lastPos.x));
+//    dotWorld.rotateZ += 0.01f * (loc.x - lastPos.x);
+//    dotWorld.rotateX += 0.01f * (-loc.y + lastPos.y);
     lastPos = loc;
 }
 

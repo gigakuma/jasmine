@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DrawModel.h"
+#import "GObject.h"
 
-@interface Label : DrawModel
+@interface Label : GObject
 {
 @protected
     BOOL _textDirty;

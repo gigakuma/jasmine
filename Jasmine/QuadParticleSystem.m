@@ -14,6 +14,7 @@
 
 - (void)initializeParticle:(Particle *)particle
 {
+    
 }
 
 - (void)updateParticle:(Particle *)particle withInterval:(NSTimeInterval)dt

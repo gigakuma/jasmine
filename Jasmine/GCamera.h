@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <GLKit/GLKMath.h>
 
-@interface Camera : NSObject
+@interface GCamera : NSObject
 
 @property (nonatomic, readonly) GLKMatrix4 matrix;
 //@property (nonatomic, setter = setEye:) GLKVector3 eye;
@@ -32,11 +32,14 @@
 @property (nonatomic, assign) float upY;
 @property (nonatomic, assign) float upZ;
 
+- (void)setWithCamera:(GCamera*)camera;
+
+/// experimental methods ///
 - (void)zoomInWithDistance:(float)distance;
 - (void)zoomOutWithDistance:(float)distance;
-
-- (void)setWithCamera:(Camera*)camera;
-
-- (void)test:(float)value;
+- (void)rotateXAroundCenterWithRadians:(float)radians;
+- (void)rotateYAroundCenterWithRadians:(float)radians;
+- (void)rorateXYAroundCenterWithX:(float)x Y:(float)y;
+- (void)rotateWithVector:(GLKVector3)rotate;
 
 @end

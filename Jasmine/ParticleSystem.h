@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 Qiang Li. All rights reserved.
 //
 
-#import "DrawModel.h"
+#import "GObject.h"
 #import "ParticleEmitter.h"
 #import "Timeline.h"
 
@@ -18,7 +18,7 @@ typedef struct _Particle {
     void *property;
 } Particle;
 
-@interface ParticleSystem : DrawModel
+@interface ParticleSystem : GObject
 {
 @protected
     Particle *_particles;

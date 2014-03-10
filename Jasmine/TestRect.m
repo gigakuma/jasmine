@@ -10,7 +10,7 @@
 #import "GLTexture2D.h"
 #import "util/random.h"
 #import "GLProgram.h"
-#import "DrawWorld.h"
+#import "GWorld.h"
 #import "GLStateCache.h"
 
 typedef struct _primitiveVector
@@ -91,7 +91,7 @@ GLTexture2D* sharedTexture = nil;
     return self;
 }
 
-- (void)draw
+- (void)renderWithModelView:(GLKMatrix4)modelView inWorld:(GWorld *)world
 {
     float alpha = RANDOM_0_1*0.7f+0.3f;
     _quad.lt.color.a = alpha;
@@ -103,33 +103,36 @@ GLTexture2D* sharedTexture = nil;
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(PrimitiveQuad), &_quad);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    Camera *camera = self.world.camera;
+    GCamera *camera = world.camera;
     
     PROGRAM_USE(@"textured2d");
-    GLKMatrix4 matrixToCamera = GLKMatrix4Multiply(camera.matrix, self.modelToWorldTransformCache);
+    GLKMatrix4 matrixToCamera = modelView;
     GLKVector3 posWorld = GLKMatrix4MultiplyAndProjectVector3(matrixToCamera, GLKVector3Make(0, 0, 0));
-    GLKVector3 xVector = GLKVector3Make(1, 0, 0);
-    GLKVector3 yVector = GLKVector3Make(0, 1, 0);
-    GLKVector3 zVector = GLKVector3Make(0, 0, 1);
-    GLKMatrix4 transform;
-    transform.m00 = xVector.x;
-    transform.m01 = xVector.y;
-    transform.m02 = xVector.z;
-    transform.m03 = 0;
-    transform.m10 = yVector.x;
-    transform.m11 = yVector.y;
-    transform.m12 = yVector.z;
-    transform.m13 = 0;
-    transform.m20 = zVector.x;
-    transform.m21 = zVector.y;
-    transform.m22 = zVector.z;
-    transform.m23 = 0;
-    transform.m30 = posWorld.x;
-    transform.m31 = posWorld.y;
-    transform.m32 = posWorld.z;
-    transform.m33 = 1;
+//    GLKVector3 xVector = GLKVector3Make(1, 0, 0);
+//    GLKVector3 yVector = GLKVector3Make(0, 1, 0);
+//    GLKVector3 zVector = GLKVector3Make(0, 0, 1);
+    GLKMatrix4 transform = GLKMatrix4Make(1, 0, 0, 0,
+                                          0, 1, 0, 0,
+                                          0, 0, 1, 0,
+                                          posWorld.x, posWorld.y, posWorld.z, 1);
+//    transform.m00 = xVector.x;
+//    transform.m01 = xVector.y;
+//    transform.m02 = xVector.z;
+//    transform.m03 = 0;
+//    transform.m10 = yVector.x;
+//    transform.m11 = yVector.y;
+//    transform.m12 = yVector.z;
+//    transform.m13 = 0;
+//    transform.m20 = zVector.x;
+//    transform.m21 = zVector.y;
+//    transform.m22 = zVector.z;
+//    transform.m23 = 0;
+//    transform.m30 = posWorld.x;
+//    transform.m31 = posWorld.y;
+//    transform.m32 = posWorld.z;
+//    transform.m33 = 1;
     transform = GLKMatrix4Scale(transform, self.scaleX, self.scaleY, self.scaleZ);
-    GLKMatrix4 matrix = GLKMatrix4Multiply(self.world.projection.matrix, transform);
+    GLKMatrix4 matrix = GLKMatrix4Multiply(world.projection.matrix, transform);
     //_quad.lt.position =
     GLCacheActiveTexture(GL_TEXTURE0);
     GLCacheBindTexture2D(sharedTexture);

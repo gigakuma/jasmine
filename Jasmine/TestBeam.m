@@ -8,7 +8,8 @@
 
 #import "TestBeam.h"
 #import "GLProgram.h"
-#import "DrawWorld.h"
+#import "GWorld.h"
+#import "GLStateCache.h"
 
 typedef struct _primitiveVector
 {
@@ -83,12 +84,12 @@ GLTexture2D *sharedTexture2;
     return self;
 }
 
-- (void)draw
+- (void)renderWithModelView:(GLKMatrix4)modelView inWorld:(GWorld *)world
 {
     PROGRAM_USE(@"textured3d");
     
-    Camera *camera = self.world.camera;
-    GLKMatrix4 matrixToCamera = GLKMatrix4Multiply(camera.matrix, self.modelToWorldTransformCache);
+    GCamera *camera = world.camera;
+    GLKMatrix4 matrixToCamera = GLKMatrix4Multiply(camera.matrix, self.modelToWorldTransform);
     GLKVector3 start_world = GLKMatrix4MultiplyAndProjectVector3(matrixToCamera, GLKVector3Make(0, 0, 0));
     GLKVector3 end_world = GLKMatrix4MultiplyAndProjectVector3(matrixToCamera, _end);
     GLKVector3 vector = GLKVector3Subtract(end_world, start_world);
@@ -112,7 +113,7 @@ GLTexture2D *sharedTexture2;
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glUniformMatrix4fv(u_matrix, 1, GL_FALSE, self.world.projection.matrix.m);
+    glUniformMatrix4fv(u_matrix, 1, GL_FALSE, world.projection.matrix.m);
     glUniform1i(u_texture, 0);
     glBindVertexArrayOES(_vertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

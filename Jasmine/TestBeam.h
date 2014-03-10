@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 Qiang Li. All rights reserved.
 //
 
-#import "DrawModel.h"
+#import "GObject.h"
 
-@interface TestBeam : DrawModel
+@interface TestBeam : GObject
 
 @property (nonatomic, assign) float width;
 @property (nonatomic, assign) GLKVector3 end;

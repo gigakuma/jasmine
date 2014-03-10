@@ -6,9 +6,9 @@
 //  Copyright (c) 2012 Qiang Li. All rights reserved.
 //
 
-#import "Camera.h"
+#import "GCamera.h"
 
-@interface Camera ()
+@interface GCamera ()
 {
 //    GLKVector3 _eye;
 //    GLKVector3 _center;
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation Camera
+@implementation GCamera
 
 @synthesize center = _center;
 @synthesize eye = _eye;
@@ -65,33 +65,29 @@
 
 - (GLKMatrix4)matrix
 {
-    if (_dirty)
+    if (_dirty) {
         _matrix = GLKMatrix4MakeLookAt(_eye.x, _eye.y, _eye.z,
                                        _center.x, _center.y, _center.z,
                                        _up.x, _up.y, _up.z);
+        _dirty = NO;
+    }
     return _matrix;
 }
 
 - (void)setEyeX:(float)eyeX
 {
-    if (eyeX == _eye.x)
-        return;
     _eye.x = eyeX;
     _dirty = YES;
 }
 
 - (void)setEyeY:(float)eyeY
 {
-    if (eyeY == _eye.y)
-        return;
     _eye.y = eyeY;
     _dirty = YES;
 }
 
 - (void)setEyeZ:(float)eyeZ
 {
-    if (eyeZ == _eye.z)
-        return;
     _eye.z = eyeZ;
     _dirty = YES;
 }
@@ -189,7 +185,7 @@
     return _up.z;
 }
 
-- (void)setWithCamera:(Camera *)camera
+- (void)setWithCamera:(GCamera *)camera
 {
     _eye = camera.eye;
     _up = camera.up;
@@ -197,24 +193,79 @@
     _dirty = YES;
 }
 
-- (void)test:(float)value
+- (void)rotateXAroundCenterWithRadians:(float)radians
 {
+    if (radians == 0)
+        return;
+    float sign = radians >= 0 ? 1 : -1;
     GLKVector3 eye = self.eye;
     GLKVector3 center = self.center;
     GLKVector3 up = self.up;
-    GLKVector3 direct = GLKVector3Make(-1, -1, 0);
+    GLKVector3 direct = GLKVector3Make(radians, 0, 0);
     direct = GLKMatrix4MultiplyAndProjectVector3(GLKMatrix4Invert(_matrix, NULL), direct);
     GLKVector3 diff = GLKVector3Subtract(center, eye);
     GLKVector3 axis = GLKVector3CrossProduct(diff, direct);
-    GLKMatrix4 matrix = GLKMatrix4Translate(GLKMatrix4Identity, -center.x, -center.y, -center.z);
-    matrix = GLKMatrix4Rotate(matrix, 0.02f, axis.x, axis.y, axis.z);
+    GLKMatrix4 matrix = GLKMatrix4MakeTranslation(-center.x, -center.y, -center.z);
+    matrix = GLKMatrix4Rotate(matrix, sign * radians, axis.x, axis.y, axis.z);
     matrix = GLKMatrix4Translate(matrix, center.x, center.y, center.z);
     
-    eye = GLKMatrix4MultiplyAndProjectVector3(matrix, eye);
-    self.center = GLKMatrix4MultiplyAndProjectVector3(matrix, center);
-    up = GLKMatrix4MultiplyAndProjectVector3(matrix, up);
-    self.eye = eye;
-    self.up = up;
+    self.eye = GLKMatrix4MultiplyAndProjectVector3(matrix, eye);
+    self.up = GLKMatrix4MultiplyAndProjectVector3(matrix, up);
+}
+
+- (void)rotateYAroundCenterWithRadians:(float)radians
+{
+    if (radians == 0)
+        return;
+    float sign = radians >= 0 ? 1 : -1;
+    GLKVector3 eye = self.eye;
+    GLKVector3 center = self.center;
+    GLKVector3 up = self.up;
+    GLKVector3 direct = GLKVector3Make(0, radians, 0);
+    direct = GLKMatrix4MultiplyAndProjectVector3(GLKMatrix4Invert(_matrix, NULL), direct);
+    GLKVector3 diff = GLKVector3Subtract(center, eye);
+    GLKVector3 axis = GLKVector3CrossProduct(diff, direct);
+    GLKMatrix4 matrix = GLKMatrix4MakeTranslation(-center.x, -center.y, -center.z);
+    matrix = GLKMatrix4Rotate(matrix, sign * radians, axis.x, axis.y, axis.z);
+    matrix = GLKMatrix4Translate(matrix, center.x, center.y, center.z);
+    
+    self.eye = GLKMatrix4MultiplyAndProjectVector3(matrix, eye);
+    self.up = GLKMatrix4MultiplyAndProjectVector3(matrix, up);
+}
+
+- (void)rorateXYAroundCenterWithX:(float)x Y:(float)y
+{
+    if (x == 0 && y == 0)
+        return;
+    float sa = sinf(x / 2);
+    float sb = sinf(y / 2);
+    float radians = 2 * asinf(sqrtf(sa * sa + sb * sb));
+    float sign = radians >= 0 ? 1 : -1;
+    GLKVector3 eye = self.eye;
+    GLKVector3 center = self.center;
+    GLKVector3 up = self.up;
+    GLKVector3 direct = GLKVector3Make(x, y, 0);
+    direct = GLKMatrix4MultiplyAndProjectVector3(GLKMatrix4Invert(_matrix, NULL), direct);
+    GLKVector3 diff = GLKVector3Subtract(center, eye);
+    GLKVector3 axis = GLKVector3CrossProduct(diff, direct);
+    GLKMatrix4 matrix = GLKMatrix4MakeTranslation(-center.x, -center.y, -center.z);
+    matrix = GLKMatrix4Rotate(matrix, sign * radians, axis.x, axis.y, axis.z);
+    matrix = GLKMatrix4Translate(matrix, center.x, center.y, center.z);
+    
+    self.eye = GLKMatrix4MultiplyAndProjectVector3(matrix, eye);
+    self.up = GLKMatrix4MultiplyAndProjectVector3(matrix, up);
+}
+
+- (void)rotateWithVector:(GLKVector3)rotate
+{
+    GLKMatrix4 matrix = GLKMatrix4Translate(GLKMatrix4Identity, self.center.x, self.center.y, self.center.z);
+    matrix = GLKMatrix4RotateX(matrix, rotate.x);
+    matrix = GLKMatrix4RotateY(matrix, rotate.y);
+    matrix = GLKMatrix4RotateZ(matrix, rotate.z);
+    matrix = GLKMatrix4Translate(matrix, -_center.x, -_center.y, -_center.z);
+    
+    self.eye = GLKMatrix4MultiplyAndProjectVector3(matrix, self.eye);
+    self.up = GLKMatrix4MultiplyAndProjectVector3(matrix, self.up);
 }
 
 @end

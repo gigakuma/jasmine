@@ -9,7 +9,9 @@
 #import "VolumeTest.h"
 #import "Director.h"
 #import "GLProgram.h"
-#import "DrawWorld.h"
+#import "GWorld.h"
+#import "GLTexture2D.h"
+#import "GLStateCache.h"
 
 typedef struct _vector
 {
@@ -68,7 +70,7 @@ typedef struct _quad
     return self;
 }
 
-- (void)draw
+- (void)renderWithModelView:(GLKMatrix4)modelView inWorld:(GWorld *)world
 {
 //    GLuint fbo = [Director sharedDirector].view.renderer.defaultFramebuffer;
 //    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -83,8 +85,7 @@ typedef struct _quad
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Quad), &_quad);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    GLKMatrix4 matrix = GLKMatrix4Multiply(self.world.projection.matrix, self.world.camera.matrix);
-    matrix = GLKMatrix4Multiply(matrix, self.modelToWorldTransformCache);
+    GLKMatrix4 matrix = GLKMatrix4Multiply(world.projection.matrix, modelView);
     
     glUniformMatrix4fv(PROGRAM_IN_USE_UNIFORM(@"matrix"), 1, GL_FALSE, matrix.m);
     

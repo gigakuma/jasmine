@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Qiang Li. All rights reserved.
 //
 
-#import "DrawModel.h"
+#import "GObject.h"
 
-@interface VolumeTest : DrawModel
+@interface VolumeTest : GObject
 
 @end

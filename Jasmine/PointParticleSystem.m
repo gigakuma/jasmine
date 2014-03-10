@@ -9,7 +9,7 @@
 #import "PointParticleSystem.h"
 #import "util/random.h"
 #import "GLProgram.h"
-#import "DrawWorld.h"
+#import "GWorld.h"
 
 typedef struct _PointParticleProperty
 {
@@ -90,15 +90,14 @@ typedef struct _PointParticleVertex
     _vertices[index].position = property->position;
 }
 
-- (void)draw
+- (void)renderWithModelView:(GLKMatrix4)modelView inWorld:(GWorld *)world
 {
     PROGRAM_USE(@"primitive3d");
     
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(PointParticleVertex) * self.count, _vertices);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    GLKMatrix4 matrix = GLKMatrix4Multiply(self.world.projection.matrix, self.world.camera.matrix);
-    matrix = GLKMatrix4Multiply(matrix, self.modelToWorldTransformCache);
+    GLKMatrix4 matrix = GLKMatrix4Multiply(world.projection.matrix, modelView);
     glUniformMatrix4fv(PROGRAM_IN_USE_UNIFORM(@"matrix"), 1, 0, matrix.m);
     
     glBindVertexArrayOES(_vertexArray);
